@@ -2,15 +2,15 @@
   <div>
     <form name="form">
       <header class="display element">
-        <div class="text a">{{ action || '123' }}</div>
+        <div class="text a">{{ result || '' }}</div>
         <div class="text b">{{ current || '0' }}</div>
       </header>
     </form>
     <table class="element">
       <tr>
-        <td><input class="button" type="button" value="C" @click="clear"></td>
-        <td><input class="button" type="button" value="+/-" @click="sign"></td>
-        <td><input class="button" type="button" value="%" @click="percent"></td>
+        <td><input class="button operator_alt" type="button" value="C" @click="clear"></td>
+        <td><input class="button operator_alt" type="button" value="+/-" @click="sign"></td>
+        <td><input class="button operator_alt" type="button" value="%" @click="percent"></td>
         <td><input class="button operator" type="button" value="÷" @click="divide"></td>
       </tr>
       <tr>
@@ -33,7 +33,7 @@
       </tr>
       <tr>
         <td colspan=2><input class="button" style="width: 105px" type="button" value="0" @click="append('0')"></td>
-        <td><input class="button" type="button" value="." @click="dot"></td>
+        <td><input class="button operator_cyan" type="button" value="." @click="dot"></td>
         <td><input class="button operator" type="button" value="=" @click="equal"></td>
       </tr>
     </table>  
@@ -46,14 +46,17 @@ export default {
     return {
       previous: null,
       current: '',
+      currentOperator: '',
+      result: '',
       operator: null,
       operatorClicked: false
     }
   },
   methods: {
     clear(){
-      this.action = '',
-      this.current = ''
+      this.current = '',
+      this.currentOperator='',
+      this.result=''
     },
     sign() {
       this.current = this.current.charAt(0) === '-' ?
@@ -68,7 +71,7 @@ export default {
         this.operatorClicked = false
       }
 
-      this.current = `${this.current}${number}`
+      if(this.current.length <= 10) {this.current = `${this.current}${number}`}
     },
     dot(){
       if(this.current.indexOf('.') === -1){
@@ -82,20 +85,29 @@ export default {
     divide(){
       this.operator = (a, b) => a / b
       this.setPrevious()
+      this.currentOperator = '÷'
+      this.result = `${parseFloat(this.previous)} ${this.currentOperator} `
     },
     times(){
       this.operator = (a, b) => a * b
       this.setPrevious()
+      this.currentOperator = 'x'
+      this.result = `${parseFloat(this.previous)} ${this.currentOperator} `
     },
     minus(){
       this.operator = (a, b) => a - b
       this.setPrevious()
+      this.currentOperator = '-'
+      this.result = `${parseFloat(this.previous)} ${this.currentOperator} `
     },
     plus(){
       this.operator = (a, b) => a + b
       this.setPrevious()
+      this.currentOperator = '+'
+      this.result = `${parseFloat(this.previous)} ${this.currentOperator} `
     },
     equal(){
+      this.result = `${parseFloat(this.previous)} ${this.currentOperator} ${parseFloat(this.current)} = `
       this.current = `${ this.operator(parseFloat(this.current), parseFloat(this.previous)) }`
       this.previous = null
     }
@@ -143,5 +155,15 @@ export default {
 .operator{
   background-color: #ffc309;
   color: #7b5904;
+}
+
+.operator_alt{
+  background-color:#ff01b3;
+  color: white;
+}
+
+.operator_cyan{
+  background-color:#01eeff;
+  color: white;
 }
 </style>
